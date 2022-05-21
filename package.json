@@ -1,0 +1,10 @@
+{
+  "name": "development-server",
+  "version": "0.1.0",
+  "description": "Simple development server with hot reload",
+  "main": "index.js",
+  "author": "Ivan Timoshenko <tis1993@mail.ru>",
+  "bin": {
+    "development-server": "./src/index.js"
+  }
+}

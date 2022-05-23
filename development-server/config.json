@@ -1,0 +1,16 @@
+{
+  "staticServer": {
+    "host": "127.0.0.1",
+    "port": "6009",
+    "workDir": "../"
+  },
+  "sseServer": {
+    "host": "127.0.0.1",
+    "port": "9006",
+    "pingDelay": 5000
+  },
+  "watchServer": {
+    "workDir": "../",
+    "watchDelay": 100
+  }
+}

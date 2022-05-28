@@ -1,10 +1,10 @@
-module.exports.debounce = function debounce(cb, ms) {
+module.exports.debounce = (cb, ms) => {
   let isCooldown = false;
 
-  return function() {
+  return (...args) => {
     if (isCooldown) return;
 
-    cb.apply(this, arguments);
+    cb.apply(this, args);
 
     isCooldown = true;
 

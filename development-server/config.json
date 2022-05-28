@@ -7,9 +7,10 @@
   "sseServer": {
     "host": "127.0.0.1",
     "port": "9006",
-    "pingDelay": 5000
+    "heartbeatDelay": 5000
   },
   "watchServer": {
+    "watchedFiles": ["/index.html", "/index.js", "/index.css"],
     "workDir": "../",
     "watchDelay": 100
   }

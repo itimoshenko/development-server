@@ -1,15 +1,21 @@
-const staticServer = require('./static-server');
-const watchServer = require('./watch-server');
-const sseServer = require('./sse-server');
+const { spawn } = require('child_process');
 
-watchServer(() => {
-  server.close();
+const createStaticServer = require('./static-server');
+const createWatchServer = require('./watch-server');
+const createSSEServer = require('./sse-server');
 
-  server = staticServer(true);
+const config = require('./config.json');
+
+const staticServer = createStaticServer(config.staticServer);
+const watchServer = createWatchServer(config.watchServer);
+const sseServer = createSSEServer(config.sseServer);
+
+staticServer.on('init', (payload) => {
+  spawn('open', [payload.url]);
 });
 
-let server = staticServer();
-
-sseServer();
-
-
+watchServer.on('file:changed', () => {
+  sseServer.send('action:reload');
+  // TODO: for backend server
+  // staticServer.reload();
+});

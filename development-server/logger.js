@@ -1,3 +1,3 @@
-module.exports.log = function log(...messages) {
-  console.log(...messages);
+module.exports =  (module) => (...messages) => {
+  console.log(`${module}: \t`, ...messages);
 };

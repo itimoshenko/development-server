@@ -1,50 +1,55 @@
 const http = require('http');
+const EventEmitter = require('node:events');
 
-const { log } = require('./logger');
+const log = require('./logger')('sse-server');
 
-const config = require('./config.json').sseServer;
+const sseServerEventEmitter = new EventEmitter();
 
-const PORT = config.port;
-const HOST = config.host;
+const writeEvent = (context, message) => {
+  const id = Date.now();
 
-const PING_DELAY = config.pingDelay;
+  context.res.write(`id: ${id} \n`);
+  context.res.write(`data: ${message} \n\n`);
+};
 
-function sendServerSendEvent(req, res) {
-  res.writeHead(200, {
-    'Content-Type' : 'text/event-stream',
-    'Cache-Control' : 'no-cache',
-    'Connection' : 'keep-alive',
-    'Access-Control-Allow-Origin': '*',
-  });
+const startHeartbeat = (context) => setInterval(() => writeEvent(context, 'heartbeat'), context.config.heartbeatDelay);
 
-  const sseId = (new Date()).toLocaleTimeString();
+module.exports = (config) => {
+  const server = http.createServer((req, res) => {
+    const context = {
+      req,
+      res,
+      config
+    };
 
-  setInterval(function() {
-    writeServerSendEvent(res, sseId, (new Date()).toLocaleTimeString());
-  }, PING_DELAY);
-
-  writeServerSendEvent(res, sseId, (new Date()).toLocaleTimeString());
-}
-
-function writeServerSendEvent(res, sseId, data) {
-  res.write('id: ' + sseId + '\n');
-  res.write('data: new server event ' + data + '\n\n');
-}
-
-module.exports = function create() {
-  const server = http.createServer(function(req, res) {
     if (req.headers.accept && req.headers.accept == 'text/event-stream' && req.url == '/development-server') {
-      sendServerSendEvent(req, res);
+      res.writeHead(200, {
+        'Content-Type' : 'text/event-stream',
+        'Cache-Control' : 'no-cache',
+        'Connection' : 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+      });
+
+      sseServerEventEmitter.on('message', (payload) => {
+        writeEvent(context, payload.message);
+      });
+
+      startHeartbeat(context);
     } else {
       res.writeHead(404);
       res.end();
     }
-
-  }).listen(PORT, HOST, () => {
-    log('sse-server is running');
-    log(`http://${PORT}:${HOST}/`);
-    log();
   });
 
-  return server;
+  server.listen(config.port, config.host, () => {
+    const url = `http://${config.host}:${config.port}/`;
+
+    log(`Server has been started on ${url}`);
+  });
+
+  server.on('close', () => log('Server has been closed'));
+
+  return {
+    send: (message) => sseServerEventEmitter.emit('message', { message })
+  };
 };

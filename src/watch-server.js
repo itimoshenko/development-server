@@ -9,9 +9,10 @@ const log = require('./logger')('watch-server');
 const watchServerEventEmitter = new EventEmitter();
 
 module.exports = (config) => {
-  const workDir = path.resolve(__dirname, config.workDir);
+  const workDir = path.resolve(process.cwd(), config.workDir);
 
   (config.watchedFiles || []).forEach((filePath) => {
+
     const fullPath = path.join(workDir, filePath);
 
     fs.access(fullPath, fs.F_OK, (err) => {

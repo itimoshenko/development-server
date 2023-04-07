@@ -12,6 +12,10 @@ const getFileContentType = (filePath) => {
     return 'image/svg+xml';
   }
 
+  if (filePath.includes('.jpeg')) {
+    return 'image/jpeg';
+  }
+
   return null;
 };
 

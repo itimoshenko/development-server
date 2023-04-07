@@ -32,7 +32,7 @@ const sendFile = (context, filePath) => {
     headers['Content-Type'] = fileContentType;
   }
 
-  const fileStream = fs.createReadStream(filePath, 'utf-8');
+  const fileStream = fs.createReadStream(filePath, !fileContentType ? 'utf-8' : undefined);
 
   if (filePath.includes('index.html')) {
     fileStream.on('readable', () => {
@@ -76,6 +76,7 @@ module.exports = (config) => {
 
     if (req.method === 'GET') {
       const filePath = getFilePathByUrl(context, req.url);
+
 
       fs.access(filePath, fs.F_OK, (err) => {
         if (!err) {

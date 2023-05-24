@@ -16,6 +16,10 @@ const getFileContentType = (filePath) => {
     return 'image/jpeg';
   }
 
+  if (filePath.includes('.js')) {
+    return 'text/javascript';
+  }
+
   return null;
 };
 
